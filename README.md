@@ -1,0 +1,7 @@
+# WaveLab
+
+WaveLab is a local HTTP service for tow-tank experiments. The original equipment and interlock pages expose a fixed commissioning diagnostic scenario. Operator measurements are a separate live data path.
+
+Set `WAVELAB_DATA_DIR` to choose the archive directory (default `data/wavelab`). `POST /api/measured-runs` accepts `name`, `model_name`, `section`, and `carriage`. `POST /api/measured-runs/{id}/evidence` accepts `kind` (`wave_time` or `force`), `source_id`, finite `value`, and `recorded_at` in RFC3339 form. `GET /api/measured-runs`, `GET /api/measured-runs/{id}`, and `GET /api/measured-runs/{id}/analysis` return the supplied records and wave/force summary. Measurements are committed to `operator-measurements.json` before they are published in memory, and are reloaded when the service restarts. The archive does not automatically grant a safety permit or drive hardware.
+
+The `internal/probe`, `internal/force`, `internal/permit`, `internal/carriage`, `internal/track`, `internal/wave`, `internal/absorber`, and `internal/journal` packages provide component logic for further work. Their diagnostic use does not imply that the original HTTP pages accept real sensor streams.
