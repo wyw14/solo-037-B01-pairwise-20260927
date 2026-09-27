@@ -2,12 +2,18 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/wyw14/solo-037/internal/model"
 )
+
+// ErrRunNotFound is returned when a request references a run the runtime
+// does not know about, so callers can tell a no-op apart from a real change.
+var ErrRunNotFound = errors.New("run not found")
 
 type Runtime struct {
 	mu           sync.Mutex
@@ -52,7 +58,7 @@ func (r *Runtime) Abort(run model.RunID, at time.Time) error {
 	defer r.mu.Unlock()
 	operation, ok := r.operations[run]
 	if !ok {
-		return nil
+		return fmt.Errorf("%w: %s", ErrRunNotFound, run)
 	}
 	r.operations[run] = operation.Abort(at)
 	r.incidents = append(r.incidents, model.NewIncident(run, "warning", "operation aborted", at))

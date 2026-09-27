@@ -2,10 +2,12 @@ package api
 
 import (
     "encoding/json"
+    "errors"
     "net/http"
     "time"
 
     "github.com/wyw14/solo-037/internal/model"
+    "github.com/wyw14/solo-037/internal/service"
 )
 
 type TestHandler struct { Service TestService }
@@ -26,7 +28,12 @@ func (h TestHandler) Create(w http.ResponseWriter, request *http.Request) {
 }
 
 func (h TestHandler) Abort(w http.ResponseWriter, request *http.Request) {
-    if err := h.Service.Abort(model.RunID(request.URL.Query().Get("run")), time.Now()); err != nil {
+    err := h.Service.Abort(model.RunID(request.URL.Query().Get("run")), time.Now())
+    if errors.Is(err, service.ErrRunNotFound) {
+        http.Error(w, err.Error(), http.StatusNotFound)
+        return
+    }
+    if err != nil {
         http.Error(w, err.Error(), http.StatusConflict)
         return
     }
