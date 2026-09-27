@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"sync"
 	"time"
@@ -52,7 +53,7 @@ func (r *Runtime) Abort(run model.RunID, at time.Time) error {
 	defer r.mu.Unlock()
 	operation, ok := r.operations[run]
 	if !ok {
-		return nil
+		return errors.New("run not found")
 	}
 	r.operations[run] = operation.Abort(at)
 	r.incidents = append(r.incidents, model.NewIncident(run, "warning", "operation aborted", at))

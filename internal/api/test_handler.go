@@ -27,7 +27,7 @@ func (h TestHandler) Create(w http.ResponseWriter, request *http.Request) {
 
 func (h TestHandler) Abort(w http.ResponseWriter, request *http.Request) {
     if err := h.Service.Abort(model.RunID(request.URL.Query().Get("run")), time.Now()); err != nil {
-        http.Error(w, err.Error(), http.StatusConflict)
+        http.Error(w, err.Error(), http.StatusNotFound)
         return
     }
     w.WriteHeader(http.StatusNoContent)
